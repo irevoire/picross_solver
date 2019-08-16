@@ -1,4 +1,5 @@
 use crate::grid::*;
+use itertools::Itertools;
 
 pub fn solve(width: Vec<Vec<usize>>, height: Vec<Vec<usize>>) -> Vec<Vec<bool>> {
     let mut grid = Grid::new(width.len(), height.len());
@@ -10,7 +11,7 @@ pub fn solve(width: Vec<Vec<usize>>, height: Vec<Vec<usize>>) -> Vec<Vec<bool>> 
 pub fn force(line: &mut Vec<Cell>, indications: &Vec<usize>) -> bool {
     let nb_used_cells: usize = indications.iter().sum();
     let nb_unused_cells = line.len() - nb_used_cells;
-    // be cautious: the +1 need to be done mmmmmmmmt avoid going negative
+    // be cautious: the +1 need to be done to avoid going negative
     let nb_moving_cells = nb_unused_cells + 1 - indications.len();
 
     // is there only one possible solution?
@@ -28,13 +29,27 @@ pub fn force(line: &mut Vec<Cell>, indications: &Vec<usize>) -> bool {
 
     // we are gonna see which solutions are possible
     let mut nb_solutions = 0;
-    let mut force = vec![0; line.len()];
+    let mut force = &vec![0; line.len()];
 
     let mut groups = create_groups(indications);
     // we need to add the number of moving cells at the end of the groups
     for _ in 0..nb_moving_cells {
         groups.push(vec![Cell::Empty]);
     }
+
+    groups.iter().permutations(groups.len()).for_each(|g| {
+        let line: Vec<Cell> = groups.iter().flatten().map(|e| e.clone()).collect();
+        // TODO ensure we did not erase some already present things in the
+        // line given in parameters
+        if is_valid_line(&line, indications) {
+            nb_solutions += 1;
+            let mut force = line.iter().zip(force).map(|(l, f)| match l {
+                Full => *f + 1,
+                _ => *f,
+            });
+        }
+    });
+
     true
 }
 
