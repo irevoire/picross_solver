@@ -139,6 +139,7 @@ mod tests {
 
     #[test]
     fn test_is_valid_line() {
+        // some kind of true things
         assert_eq!(is_valid_line(&[], &[0]), true);
         assert_eq!(is_valid_line(&[Empty, Empty, Empty], &[0]), true);
         assert_eq!(is_valid_line(&[Full], &[1]), true);
@@ -154,9 +155,12 @@ mod tests {
             true
         );
 
+        // some kind of false things
+        assert_eq!(is_valid_line(&[], &[1]), false);
         assert_eq!(is_valid_line(&[Full, Empty, Full], &[1]), false);
         assert_eq!(is_valid_line(&[Empty, Full, Full], &[1]), false);
         assert_eq!(is_valid_line(&[Full, Empty, Full], &[2]), false);
         assert_eq!(is_valid_line(&[Empty, Empty, Empty], &[1]), false);
+        assert_eq!(is_valid_line(&[Full, Full, Empty, Full], &[1, 2]), false);
     }
 }
